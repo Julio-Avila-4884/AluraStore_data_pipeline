@@ -5,15 +5,15 @@ from load import load_to_csv, load_to_postgres
 
 def run_pipeline():
     raw_df = ingest_json(
-        source_path="data/source/telecomX_Data.json",
-        raw_path="data/raw/telecom_raw.json"
+        source_path="data/source/Sample_TelecomX_Data.json",
+        raw_path="data/raw/Sample_telecomX_raw.json"
     )
 
     clean_df = transform_data(raw_df)
 
     load_to_csv(
         clean_df,
-        output_path="data/final/telecom_final.csv"
+        output_path="data/final/Sample_telecom_final.csv"
     )
 
     load_to_postgres(
