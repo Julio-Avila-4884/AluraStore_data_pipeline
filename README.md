@@ -29,6 +29,8 @@ telecom_pipeline/
 │ ├── source/
 │ ├── raw/
 │ └── final/
+├── sql/
+│ └── validation.sql/
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
@@ -48,3 +50,8 @@ docker compose up -d
 Desde la raíz del proyecto:
 
 python src/main.py
+
+## Validación de datos
+
+Después de la carga, se pueden ejecutar consultas SQL básicas para validar el contenido de la tabla `telecom_customers`.
+Las consultas de ejemplo se encuentran en `sql/validation.sql`.
