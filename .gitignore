@@ -8,8 +8,13 @@ venv/
 .env
 
 # Data
-data/raw/
-data/final/
+data/raw/*
+data/final/*
+
+# Keep directory structure
+!data/source/.gitkeep
+!data/raw/.gitkeep
+!data/final/.gitkeep
 
 # OS
 .DS_Store
