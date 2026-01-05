@@ -45,7 +45,10 @@ alura_store_pipeline/
 ├── requirements.txt
 └── README.md
 
-## Ejecución del pipeline
+```
+---
+
+## Estructura del proyecto
 
 Desde la raíz del proyecto, con el entorno virtual activo:
 
