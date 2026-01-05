@@ -1,63 +1,67 @@
 import pandas as pd
 
 
-REQUIRED_COLUMNS = [
-    "customerid",
-    "tenure",
-    "monthlycharges",
-    "totalcharges",
-    "churn"
-]
-
-
-def validate_schema(df: pd.DataFrame) -> None:
-    missing_cols = [c for c in REQUIRED_COLUMNS if c not in df.columns]
-    if missing_cols:
-        raise ValueError(f"Missing required columns: {missing_cols}")
-
-
-def transform_data(df: pd.DataFrame) -> pd.DataFrame:
+def transform_sales_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Transforms raw JSON-normalized DataFrame into a clean, flat dataset.
+    Transforms raw sales data into a clean, analysis-ready fact table.
+
+    Steps:
+    1. Normalize column names
+    2. Validate required schema
+    3. Apply type conversions and basic cleaning
     """
 
+    # --------------------------------------------------
     # 1. Normalize column names
-    df.columns = [c.strip().lower() for c in df.columns]
+    # --------------------------------------------------
+    df.columns = (
+        df.columns
+        .str.lower()
+        .str.strip()
+        .str.replace(" ", "_")
+        .str.replace("á", "a")
+        .str.replace("é", "e")
+        .str.replace("í", "i")
+        .str.replace("ó", "o")
+        .str.replace("ú", "u")
+    )
 
-    # 2. Extract and rename nested fields (EXPLICIT MODELING)
-    df = df.rename(columns={
-        "customer.tenure": "tenure",
-        "account.charges.monthly": "monthlycharges",
-        "account.charges.total": "totalcharges"
-    })
-
-    # 3. Select only relevant columns
-    df = df[
-        [
-            "customerid",
-            "tenure",
-            "monthlycharges",
-            "totalcharges",
-            "churn"
-        ]
+    # --------------------------------------------------
+    # 2. Validate required columns (data contract)
+    # --------------------------------------------------
+    required_columns = [
+        "producto",
+        "categoria_del_producto",
+        "precio",
+        "fecha_de_compra",
+        "cantidad_de_cuotas",
+        "store_id"
     ]
 
-    # 4. Validate schema
-    validate_schema(df)
+    missing_columns = set(required_columns) - set(df.columns)
+    if missing_columns:
+        raise ValueError(f"Missing required columns: {missing_columns}")
 
-    # 5. Remove duplicates
-    df = df.drop_duplicates()
+    # --------------------------------------------------
+    # 3. Type casting & transformations
+    # --------------------------------------------------
 
-    # 6. Handle missing critical fields
-    df = df[df["customerid"].notna()]
-    df = df[df["tenure"].notna()]
+    # Precio: viene sin separador → COP
+    df["precio"] = df["precio"].astype(float)
 
-    # 7. Type casting
-    df["tenure"] = df["tenure"].astype(int)
-    df["monthlycharges"] = df["monthlycharges"].astype(float)
-    df["totalcharges"] = pd.to_numeric(df["totalcharges"], errors="coerce")
+    # Cantidad de cuotas
+    df["cantidad_de_cuotas"] = df["cantidad_de_cuotas"].astype(int)
 
-    # 8. Normalize categorical fields
-    df["churn"] = df["churn"].map({"Yes": True, "No": False})
+    # Fecha (formato dd/mm/yyyy)
+    df["fecha_de_compra"] = pd.to_datetime(
+        df["fecha_de_compra"],
+        format="%d/%m/%Y",
+        errors="coerce"
+    )
+
+    # --------------------------------------------------
+    # 4. Optional: basic sanity filtering
+    # --------------------------------------------------
+    df = df[df["precio"] > 0]
 
     return df

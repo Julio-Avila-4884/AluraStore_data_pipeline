@@ -1,21 +1,11 @@
 # Python
-__pycache__/
-*.pyc
-*.pyo
-
-# Virtual environment
 venv/
-.env
+__pycache__/
 
-# Data
+# Generated data
 data/raw/*
-data/final/*
 
-# Keep directory structure
+
+# Keep sample source data
+!data/source/*.csv
 !data/source/.gitkeep
-!data/raw/.gitkeep
-!data/final/.gitkeep
-
-# OS
-.DS_Store
-Thumbs.db
